@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ice Hockey Match Digest: 2026 Season GAME19</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* カスタムフォントとグローバル設定 */
+        body {
+            font-family: 'Noto Sans JP', 'Roboto', sans-serif;
+            background-color: #F8FAFC; /* より明るくクリーンな背景 */
+            color: #0F172A; /* 視認性の高いダークスレート */
+        }
+
+        /* パレット定義 (Cool & Warm High Contrast)
+           白チーム (White Team): #0077B6
+           色チーム (Color Team): #D00000
+           アクセント (Accent): #48CAE4
+        */
+
+        /* チャートコンテナのスタイリング */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+
+        /* 影と角丸を強調したマテリアル風プレミアムカード */
+        .info-card {
+            background-color: #FFFFFF;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02), inset 0 0 0 1px rgba(241, 245, 249, 1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .info-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
+        }
+
+        /* タイムライン用の装飾 */
+        .flow-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, #E2E8F0 0%, #CBD5E1 50%, #E2E8F0 100%);
+            transform: translateX(-50%);
+            z-index: 0;
+        }
+        .flow-dot-left {
+            position: absolute;
+            left: 50%;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: #D00000;
+            border: 3px solid white;
+            box-shadow: 0 0 8px rgba(208, 0, 0, 0.4);
+            transform: translate(-50%, 4px);
+            z-index: 10;
+        }
+        .flow-dot-right {
+            position: absolute;
+            left: 50%;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: #0077B6;
+            border: 3px solid white;
+            box-shadow: 0 0 8px rgba(0, 119, 182, 0.4);
+            transform: translate(-50%, 4px);
+            z-index: 10;
+        }
+
+        /* スクロールバーのカスタマイズ */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94A3B8;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748B;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- ヘッダーセクション（ライバル対決を象徴するグラデーション） -->
+    <header class="bg-gradient-to-r from-[#D00000] via-[#5C3A8D] to-[#0077B6] text-white py-14 px-4 shadow-xl relative overflow-hidden">
+        <div class="absolute inset-0 bg-black/10"></div>
+        <div class="max-w-6xl mx-auto text-center relative z-10">
+            <div class="inline-block bg-white/20 backdrop-blur-md px-5 py-1.5 rounded-full text-xs font-black tracking-widest mb-4 uppercase border border-white/20">
+                2026 Season &bull; Game 19
+            </div>
+            <h1 class="text-4xl md:text-6xl font-black mb-3 tracking-tight uppercase">Match Digest</h1>
+            <p class="text-xl md:text-2xl font-medium text-slate-100 flex items-center justify-center gap-2">
+                <span>📅</span> 2026年5月16日 13:34
+            </p>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="max-w-6xl mx-auto px-4 py-8 -mt-10">
+        
+        <!-- スコアボードカード -->
+        <div class="info-card p-8 mb-12 relative z-10 border-t-4 border-[#48CAE4]">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+                <!-- 勝者：色チーム -->
+                <div class="flex-1 text-center md:text-left">
+                    <div class="flex items-center justify-center md:justify-start gap-2 mb-1">
+                        <span class="text-xs bg-[#D00000]/10 text-[#D00000] px-2.5 py-0.5 rounded-full font-bold">WINNER</span>
+                    </div>
+                    <h2 class="text-3xl font-black text-[#D00000] tracking-wider">色チーム</h2>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Color Team</p>
+                </div>
+                
+                <!-- スコア表示 -->
+                <div class="flex items-center gap-6 md:gap-12 bg-slate-50/80 px-8 py-4 rounded-2xl border border-slate-100">
+                    <span class="text-6xl md:text-8xl font-black text-[#D00000] drop-shadow-sm">6</span>
+                    <div class="flex flex-col items-center">
+                        <span class="text-lg font-bold text-slate-400">VS</span>
+                        <span class="text-2xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-bold uppercase mt-2 tracking-wider">Final</span>
+                    </div>
+                    <span class="text-6xl md:text-8xl font-black text-[#0077B6] drop-shadow-sm">4</span>
+                </div>
+                
+                <!-- 敗者：白チーム -->
+                <div class="flex-1 text-center md:text-right">
+                    <div class="flex items-center justify-center md:justify-end gap-2 mb-1">
+                        <span class="text-xs bg-slate-100 text-slate-500 px-2.5 py-0.5 rounded-full font-bold">FIGHT</span>
+                    </div>
+                    <h2 class="text-3xl font-black text-[#0077B6] tracking-wider">白チーム</h2>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">White Team</p>
+                </div>
+            </div>
+
+            <!-- シーズン通算成績トラッカー -->
+            <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Current Season Standing</p>
+                <div class="inline-flex items-center gap-4 bg-slate-100 px-6 py-2 rounded-full font-bold text-sm">
+                    <span class="text-[#D00000]">色 9勝</span>
+                    <span class="text-slate-400">&bull;</span>
+                    <span class="text-[#0077B6]">白 9勝</span>
+                    <span class="text-slate-400">&bull;</span>
+                    <span class="text-slate-500">引分 1</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-2">※ 本試合の勝利により、対戦成績が完全にイーブンへと並びました！</p>
+            </div>
+        </div>
+
+        <!-- ピリオド別スコア表 -->
+        <section class="max-w-3xl mx-auto mb-12">
+            <div class="info-card p-6 overflow-hidden">
+                <h3 class="text-lg font-bold text-[#102A43] mb-4 flex items-center gap-2">
+                    <span>🏒</span> ピリオド別スコア
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-center border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200">
+                                <th class="py-3 px-4 text-sm font-bold text-slate-500 text-left">TEAM</th>
+                                <th class="py-3 px-4 text-sm font-bold text-slate-500">1P</th>
+                                <th class="py-3 px-4 text-sm font-bold text-slate-500">2P</th>
+                                <th class="py-3 px-4 text-sm font-bold text-slate-500">3P</th>
+                                <th class="py-3 px-4 text-sm font-bold text-slate-900 bg-slate-100">合計</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                <td class="py-4 px-4 text-left font-black text-[#D00000] flex items-center gap-1.5">
+                                    <span class="w-3 h-3 bg-[#D00000] rounded-full inline-block"></span>色チーム
+                                </td>
+                                <td class="py-4 px-4 text-slate-600 font-medium">3</td>
+                                <td class="py-4 px-4 text-slate-600 font-medium">2</td>
+                                <td class="py-4 px-4 text-slate-600 font-medium">1</td>
+                                <td class="py-4 px-4 font-black text-[#D00000] bg-red-50/50 text-lg">6</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="py-4 px-4 text-left font-black text-[#0077B6] flex items-center gap-1.5">
+                                    <span class="w-3 h-3 bg-[#0077B6] rounded-full inline-block"></span>白チーム
+                                </td>
+                                <td class="py-4 px-4 text-slate-600 font-medium">2</td>
+                                <td class="py-4 px-4 text-slate-600 font-medium">2</td>
+                                <td class="py-4 px-4 text-slate-600 font-medium">0</td>
+                                <td class="py-4 px-4 font-black text-[#0077B6] bg-blue-50/50 text-lg">4</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 試合総評 -->
+        <section class="mb-16 max-w-3xl mx-auto text-center px-4">
+            <h3 class="text-2xl font-black text-slate-800 mb-4 flex items-center justify-center gap-2">
+                <span>📝</span> 試合総評
+            </h3>
+            <p class="text-base md:text-lg text-slate-600 leading-relaxed font-normal">
+                2026シーズン第19戦は、両チーム合わせて10ゴールが飛び交う極めて白熱した乱撃戦となりました。<strong>色チーム</strong>はエース村上選手が1試合4ゴールという凄まじい決定力でチームを牽引。一方の<strong>白チーム</strong>も一郷選手のマルチゴールや、BJ選手・たかし選手による組織的なパスワークで常に1〜2点差を維持し喰らい付きました。しかし、後半に流れを引き戻し、要所で勝負を決めるシュートを決めた<strong>千尭選手</strong>がゲームMVPに選出され、色チームが6-4で死闘を制しました。
+            </p>
+        </section>
+
+        <!-- 得点詳細（ゲームフロー） -->
+        <section class="info-card p-6 md:p-10 mb-12">
+            <div class="mb-10 border-b border-slate-100 pb-4">
+                <h3 class="text-2xl font-black text-slate-800 flex items-center gap-2">
+                    <span>⏱️</span> 得点詳細（ゲームフロー）
+                </h3>
+                <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-bold">Scoring Timeline & Play-by-Play</p>
+            </div>
+
+            <div class="relative">
+                <!-- 垂直タイムラインライン -->
+                <div class="flow-line hidden md:block"></div>
+
+                <!-- 1st Period -->
+                <div class="mb-12">
+                    <div class="flex justify-center mb-8">
+                        <span class="bg-slate-800 text-white px-6 py-1.5 rounded-full text-xs font-black tracking-widest z-10 shadow-sm">1st Period (0:00 - 30:00)</span>
+                    </div>
+
+                    <!-- 色1点目 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-20 mb-6 relative">
+                        <div class="bg-red-50/60 p-4 rounded-xl border-r-4 border-[#D00000] text-right relative shadow-2xs hover:shadow-sm transition-shadow">
+                            <span class="text-xs font-bold text-[#D00000] block mb-1">GOAL! 色 1点目 [05:12]</span>
+                            <div class="text-lg font-black text-slate-800">村上</div>
+                            <div class="text-xs text-slate-400 font-bold">Assist: なし</div>
+                        </div>
+                        <div class="flow-dot-left hidden md:block"></div>
+                        <div class="hidden md:block"></div>
+                    </div>
+
+                    <!-- 白1点目 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-20 mb-6 relative">
+                        <div class="hidden md:block"></div>
+                        <div class="flow-dot-right hidden md:block"></div>
+                        <div class="bg-blue-50/60 p-4 rounded-xl border-l-4 border-[#0077B6] relative shadow-2xs hover:shadow-sm transition-shadow">
+                            <span class="text-xs font-bold text-[#0077B6] block mb-1">GOAL! 白 1点目 [12:45]</span>
+                            <div class="text-lg font-black text-slate-800">小原</div>
+                            <div class="text-xs text-slate-500 font-semibold">Assist: BJ</div>
+                        </div>
+                    </div>
+
+                    <!-- 色2点目 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-20 mb-6 relative">
+                        <div class="bg-red-50/60 p-4 rounded-xl border-r-4 border-[#D00000] text-right relative shadow-2xs hover:shadow-sm transition-shadow">
+                            <span class="text-xs font-bold text-[#D00000] block mb-1">GOAL! 色 2点目 [18:22]</span>
+                            <div class="text-lg font-black text-slate-800">村上</div>
+                            <div class="text-xs text-slate-400 font-bold">Assist: なし</div>
+                        </div>
+                        <div class="flow-dot-left hidden md:block"></div>
+                        <div class="hidden md:block"></div>
+                    </div>
+
+                    <!-- 白2点目 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-20 mb-6 relative">
+                        <div class="hidden md:block"></div>
+                        <div class="flow-dot-right hidden md:block"></div>
+                        <div class="bg-blue-50/60 p-4 rounded-xl border-l-4 border-[#0077B6] relative shadow-2xs hover:shadow-sm transition-shadow">
+                            <span class="text-xs font-bold text-[#0077B6] block mb-1">GOAL! 白 2点目 [23:05]</span>
+                            <div class="text-lg font-black text-slate-800">一郷</div>
+                            <div class="text-xs text-slate-500 font-semibold">Assist: たかし</div>
+                        </div>
+                    </div>
+
+                    <!-- 色3点目 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-20 mb-6 relative">
+                        <div class="bg-red-50/60 p-4 rounded-xl border-r-4 border-[#D00000] text-right relative shadow-2xs hover:shadow-sm transition-shadow">
+                            <span class="text-xs font-bold text-[#D00000] block mb-1">GOAL! 色 3点目 [28:40]</span>
+                            <div class="text-lg font-black text-slate-800">千尭</div>
+                            <div class="text-xs text-slate-400 font-bold">Assist: なし</div>
+                        </div>
+                        <div class="flow-dot-left hidden md:block"></div>
+                        <div class="hidden md:block"></div>
+                    </div>
+                </div>
+
+                <!-- 2nd Period -->
+                <div class="mb-12">
+                    <div class="flex justify-center mb-8">
+                        <span class="bg-slate-800 text-white px-6 py-1.5 rounded-full text-xs font-black tracking-widest z-10 shadow-sm">2nd Period (30:00 - 60:00)</span>
+                    </div>
+
+                    <!-- 色4点目 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-20 mb-6 relative">
+                        <div class="bg-red-50/60 p-4 rounded-xl border-r-4 border-[#D00000] text-right relative shadow-2xs hover:shadow-sm transition-shadow">
+                            <span class="text-xs font-bold text-[#D00000] block mb-1">GOAL! 色 4点目 [35:18]</span>
+                            <div class="text-lg font-black text-slate-800">村上</div>
+                            <div class="text-xs text-slate-500 font-semibold">Assist: Gretzky</div>
+                        </div>
+                        <div class="flow-dot-left hidden md:block"></div>
+                        <div class="hidden md:block"></div>
+                    </div>
+
+                    <!-- 白3点目 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-20 mb-6 relative">
+                        <div class="hidden md:block"></div>
+                        <div class="flow-dot-right hidden md:block"></div>
+                        <div class="bg-blue-50/60 p-4 rounded-xl border-l-4 border-[#0077B6] relative shadow-2xs hover:shadow-sm transition-shadow">
+                            <span class="text-xs font-bold text-[#0077B6] block mb-1">GOAL! 白 3点目 [44:50]</span>
+                            <div class="text-lg font-black text-slate-800">啓介</div>
+                            <div class="text-xs text-slate-500 font-semibold">Assist: BJ, たかし</div>
+                        </div>
+                    </div>
+
+                    <!-- 色5点目 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-20 mb-6 relative">
+                        <div class="bg-red-50/60 p-4 rounded-xl border-r-4 border-[#D00000] text-right relative shadow-2xs hover:shadow-sm transition-shadow">
+                            <span class="text-xs font-bold text-[#D00000] block mb-1">GOAL! 色 5点目 [51:12]</span>
+                            <div class="text-lg font-black text-slate-800">千尭</div>
+                            <div class="text-xs text-slate-500 font-semibold">Assist: つかさ</div>
+                        </div>
+                        <div class="flow-dot-left hidden md:block"></div>
+                        <div class="hidden md:block"></div>
+                    </div>
+
+                    <!-- 白4点目 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-20 mb-6 relative">
+                        <div class="hidden md:block"></div>
+                        <div class="flow-dot-right hidden md:block"></div>
+                        <div class="bg-blue-50/60 p-4 rounded-xl border-l-4 border-[#0077B6] relative shadow-2xs hover:shadow-sm transition-shadow">
+                            <span class="text-xs font-bold text-[#0077B6] block mb-1">GOAL! 白 4点目 [56:30]</span>
+                            <div class="text-lg font-black text-slate-800">一郷</div>
+                            <div class="text-xs text-slate-500 font-semibold">Assist: BJ</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3rd Period -->
+                <div class="mb-4">
+                    <div class="flex justify-center mb-8">
+                        <span class="bg-slate-800 text-white px-6 py-1.5 rounded-full text-xs font-black tracking-widest z-10 shadow-sm">3rd Period (60:00 - END)</span>
+                    </div>
+
+                    <!-- 色6点目 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-20 mb-6 relative">
+                        <div class="bg-red-50/60 p-4 rounded-xl border-r-4 border-[#D00000] text-right relative shadow-2xs hover:shadow-sm transition-shadow">
+                            <span class="text-xs font-bold text-[#D00000] block mb-1">GOAL! 色 6点目 [01:14:25]</span>
+                            <div class="text-lg font-black text-slate-800">村上</div>
+                            <div class="text-xs text-slate-500 font-semibold">Assist: 上乃</div>
+                        </div>
+                        <div class="flow-dot-left hidden md:block"></div>
+                        <div class="hidden md:block"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ビジュアルチャートエリア -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            
+            <!-- ピリオド別得点推移 -->
+            <div class="info-card p-6">
+                <div class="mb-6 border-b border-slate-100 pb-4">
+                    <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <span>🕒</span> ピリオド別得点推移
+                    </h3>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Scoring Breakdown</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="periodChart"></canvas>
+                </div>
+            </div>
+
+            <!-- MVP スポットライト -->
+            <div class="info-card p-8 bg-gradient-to-br from-[#D00000] to-[#9B0000] text-white flex flex-col justify-center items-center text-center relative overflow-hidden">
+                <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full"></div>
+                <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center text-3xl mb-4 backdrop-blur-md border border-white/20 shadow-sm">👑</div>
+                <h3 class="text-xs font-bold opacity-75 uppercase tracking-widest mb-1">Match MVP</h3>
+                <h2 class="text-4xl font-black mb-1 tracking-wide">千尭</h2>
+                <p class="text-red-100 font-medium mb-6 text-sm">Color Team / Forward</p>
+                
+                <div class="grid grid-cols-3 gap-4 w-full max-w-xs">
+                    <div class="bg-white/10 rounded-xl p-3 border border-white/10">
+                        <div class="text-2xl font-black">2</div>
+                        <div class="text-[10px] opacity-75 uppercase font-bold mt-1">Goals</div>
+                    </div>
+                    <div class="bg-white/10 rounded-xl p-3 border border-white/10">
+                        <div class="text-2xl font-black">0</div>
+                        <div class="text-[10px] opacity-75 uppercase font-bold mt-1">Assists</div>
+                    </div>
+                    <div class="bg-white/10 rounded-xl p-3 border border-white/10">
+                        <div class="text-2xl font-black">2</div>
+                        <div class="text-[10px] opacity-75 uppercase font-bold mt-1">Points</div>
+                    </div>
+                </div>
+                <p class="text-2xs text-red-100/80 mt-4 leading-relaxed px-2">
+                    チーム勝利を引き寄せた中盤の貴重な勝ち越しゴールと献身的なディフェンスが評価され、今ゲームの最優秀選手に選出されました。
+                </p>
+            </div>
+
+            <!-- 選手別ポイント貢献度 -->
+            <div class="info-card p-6 col-span-1 md:col-span-2">
+                <div class="mb-6 border-b border-slate-100 pb-4">
+                    <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <span>🏒</span> 選手別ポイント貢献度 (G + A)
+                    </h3>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Player Total Points Comparison</p>
+                </div>
+                <div class="chart-container" style="max-width: 100%; height: 450px;">
+                    <canvas id="playerChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ゴールキーパー (GK) セクション -->
+        <section class="info-card p-8 mb-12">
+            <h3 class="text-lg font-black text-slate-800 mb-6 border-l-4 border-[#48CAE4] pl-3 uppercase">
+                🛡️ 出場ゴールキーパー (GK)
+            </h3>
+            <div class="flex flex-wrap gap-4">
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl px-6 py-3 flex items-center gap-3 shadow-2xs hover:border-[#48CAE4] transition-colors">
+                    <span class="text-xl">🥅</span>
+                    <div>
+                        <p class="text-sm font-black text-slate-800">豊嶋</p>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">Netminder</p>
+                    </div>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl px-6 py-3 flex items-center gap-3 shadow-2xs hover:border-[#48CAE4] transition-colors">
+                    <span class="text-xl">🥅</span>
+                    <div>
+                        <p class="text-sm font-black text-slate-800">金成</p>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">Netminder</p>
+                    </div>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl px-6 py-3 flex items-center gap-3 shadow-2xs hover:border-[#48CAE4] transition-colors">
+                    <span class="text-xl">🥅</span>
+                    <div>
+                        <p class="text-sm font-black text-slate-800">木田橋</p>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">Netminder</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- フッター -->
+        <footer class="text-center text-slate-400 py-12 text-xs uppercase tracking-widest border-t border-slate-200/60">
+            <p class="font-bold">© 2026 Pirates Ice Hockey &bull; GAME 19 MATCH DIGEST</p>
+            <p class="mt-2 text-slate-400">Crafted with Visual and Analytical Excellence</p>
+        </footer>
+
+    </main>
+
+    <script>
+        // 文字列トリミング＆マルチバイト対応折り返し処理
+        function splitLabel(label) {
+            if (typeof label !== 'string' || label.length <= 16) return label;
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = words[0];
+            for (let i = 1; i < words.length; i++) {
+                if ((currentLine + ' ' + words[i]).length <= 16) {
+                    currentLine += ' ' + words[i];
+                } else {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                }
+            }
+            lines.push(currentLine);
+            return lines;
+        }
+
+        // 共通チャートオプション
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { 
+                    labels: { 
+                        font: { family: "'Noto Sans JP', sans-serif", weight: '700', size: 12 }, 
+                        color: '#475569' 
+                    }, 
+                    position: 'bottom' 
+                },
+                tooltip: {
+                    backgroundColor: '#0F172A',
+                    titleFont: { family: "'Noto Sans JP', sans-serif", weight: 'bold' },
+                    bodyFont: { family: "'Noto Sans JP', sans-serif" },
+                    padding: 12,
+                    cornerRadius: 8,
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            return Array.isArray(label) ? label.join(' ') : label;
+                        }
+                    }
+                }
+            }
+        };
+
+        const colorWhite = '#0077B6';
+        const colorColor = '#D00000';
+
+        // 1. ピリオド別得点推移チャート
+        const ctxPeriod = document.getElementById('periodChart').getContext('2d');
+        new Chart(ctxPeriod, {
+            type: 'bar',
+            data: {
+                labels: ['1st Period', '2nd Period', '3rd Period'].map(splitLabel),
+                datasets: [
+                    { label: '色チーム', data: [3, 2, 1], backgroundColor: colorColor, borderRadius: 6 },
+                    { label: '白チーム', data: [2, 2, 0], backgroundColor: colorWhite, borderRadius: 6 }
+                ]
+            },
+            options: { 
+                ...commonOptions, 
+                scales: { 
+                    y: { 
+                        beginAtZero: true, 
+                        stacked: false,
+                        grid: { color: '#E2E8F0' },
+                        ticks: { stepSize: 1, font: { weight: 'bold' } }
+                    }, 
+                    x: { 
+                        stacked: false,
+                        grid: { display: false }
+                    } 
+                } 
+            }
+        });
+
+        // 2. 選手別ポイント貢献度 (G + A) 降順並び替え
+        const players = [
+            { name: '村上 (Color)', g: 4, a: 0, t: 'C' },
+            { name: 'BJ (White)', g: 0, a: 3, t: 'W' },
+            { name: '千尭 (Color)', g: 2, a: 0, t: 'C' },
+            { name: '一郷 (White)', g: 2, a: 0, t: 'W' },
+            { name: 'たかし (White)', g: 0, a: 2, t: 'W' },
+            { name: '小原 (White)', g: 1, a: 0, t: 'W' },
+            { name: '啓介 (White)', g: 1, a: 0, t: 'W' },
+            { name: 'Gretzky (Color)', g: 0, a: 1, t: 'C' },
+            { name: 'つかさ (Color)', g: 0, a: 1, t: 'C' },
+            { name: '上乃 (Color)', g: 0, a: 1, t: 'C' }
+        ];
+
+        // 総得点順 (G+A) に降順ソート
+        players.sort((a, b) => (b.g + b.a) - (a.g + a.a));
+
+        const ctxPlayer = document.getElementById('playerChart').getContext('2d');
+        new Chart(ctxPlayer, {
+            type: 'bar',
+            data: {
+                labels: players.map(p => p.name).map(splitLabel),
+                datasets: [
+                    { 
+                        label: 'ゴール (G)', 
+                        data: players.map(p => p.g), 
+                        backgroundColor: players.map(p => p.t === 'C' ? '#D00000' : '#0077B6'),
+                        borderRadius: { topRight: 4, bottomRight: 4 }
+                    },
+                    { 
+                        label: 'アシスト (A)', 
+                        data: players.map(p => p.a), 
+                        backgroundColor: players.map(p => p.t === 'C' ? '#FF6B6B' : '#48CAE4'),
+                        borderRadius: { topRight: 4, bottomRight: 4 }
+                    }
+                ]
+            },
+            options: { 
+                ...commonOptions, 
+                indexAxis: 'y', 
+                scales: { 
+                    x: { 
+                        stacked: true, 
+                        beginAtZero: true,
+                        grid: { color: '#E2E8F0' },
+                        ticks: { stepSize: 1 }
+                    }, 
+                    y: { 
+                        stacked: true,
+                        grid: { display: false },
+                        ticks: { font: { weight: 'bold' } }
+                    } 
+                } 
+            }
+        });
+    </script>
+</body>
+</html>
